@@ -5,6 +5,8 @@ import Layout from "@layouts/Layout.astro";
 import Container from "@components/container.astro";
 import Sectionhead from "@components/sectionhead.astro";
 
+import { getBlogs } from "@utils/sanity.ts";
+
 // Filter blog entries with 'draft: false' & date before current date
 const publishedBlogEntries = await getCollection("blog", ({ data }) => {
   return !data.draft && data.publishDate < new Date();
@@ -14,6 +16,21 @@ const publishedBlogEntries = await getCollection("blog", ({ data }) => {
 publishedBlogEntries.sort(function (a, b) {
   return b.data.publishDate.valueOf() - a.data.publishDate.valueOf();
 });
+
+type Blog = {
+  _id: string;
+  name: string;
+  slug: {
+    current: string;
+  };
+  image: {
+    asset: {
+      _ref: string;
+    };
+  };
+  PublicationDate: string;
+};
+const blogs : Blog[]  = await getBlogs();
 ---
 
 <Layout title="Blog">

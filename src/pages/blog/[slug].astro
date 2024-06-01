@@ -12,6 +12,9 @@ export async function getStaticPaths() {
   }));
 }
 
+
+
+
 // Get the entry directly from the prop on render
 const { entry } = Astro.props;
 const { Content } = await entry.render();
@@ -60,3 +63,4 @@ const { Content } = await entry.render();
     </div>
   </Container>
 </Layout>
+
