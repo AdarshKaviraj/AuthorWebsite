@@ -8,22 +8,32 @@ import { useSanityClient } from 'astro-sanity';
 
 
 
-
 export async function getStaticPaths() {
   const posts = await useSanityClient().fetch(`*[_type == "blog"]`);
-  console.log(posts)
-  return posts.map((post: any) => {
+  console.log(posts);
+  
+  return posts.map((post) => {
+    const getText = (blocks) => {
+      return blocks.map(block => block.children.map(child => child.text).join('')).join('');
+    };
+
     return {
       params: {
         slug: post.slug?.current || '',
       },
-      props: { ...post },
+      props: {
+        ...post,
+        ContentBody: getText(post.ContentBody),
+        Summary: getText(post.Summary),
+        FurtherReading: getText(post.FurtherReading),
+      },
     };
   });
 }
 
-
+// Usage in a component
 const { name, PublicationDate, ContentBody, Summary, FurtherReading } = Astro.props;
+
 
 
 const truncateddate = PublicationDate.substring(0,10)
@@ -48,12 +58,15 @@ const truncateddate = PublicationDate.substring(0,10)
           datetime={truncateddate}>
           {truncateddate}
         </time>
-        <span class="text-gray-400 hidden md:block">•</span>
+        <span class="text-gray-400 hidden md:block"></span>
       </div>
     </div>
 
     <div class="mx-auto prose prose-lg mt-6 max-w-3xl">
-      {name}
+      {ContentBody}
+    </div>
+    <div class="text-gray-400 mx-auto prose prose-lg mt-6 max-w-3xl">
+      {FurtherReading}
     </div>
     <div class="text-center mt-8">
       <a
