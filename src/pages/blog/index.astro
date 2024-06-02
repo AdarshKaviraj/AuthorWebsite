@@ -7,50 +7,52 @@ import Sectionhead from "@components/sectionhead.astro";
 
 import { getBlogs } from "@utils/sanity.ts";
 
-// Filter blog entries with 'draft: false' & date before current date
-const publishedBlogEntries = await getCollection("blog", ({ data }) => {
-  return !data.draft && data.publishDate < new Date();
-});
 
-// Sort content entries by publication date
-publishedBlogEntries.sort(function (a, b) {
-  return b.data.publishDate.valueOf() - a.data.publishDate.valueOf();
-});
-
+// type Blog = {
+//   name: string;
+//   slug: {
+//     current: string;
+//   };
+//   image: {
+//     asset: {
+//       _ref: string;
+//     };
+//   };
+//   PublicationDate: string;
+// };
 type Blog = {
-  _id: string;
-  name: string;
-  slug: {
-    current: string;
-  };
-  image: {
-    asset: {
-      _ref: string;
-    };
-  };
+  blogname: string;
+  slug: string;
   PublicationDate: string;
+  imageUrl: string;
+  ContentBody: string[];
+  Summary?: string[];
+  FurtherReading?: string[];
 };
+
+
 const blogs : Blog[]  = await getBlogs();
+console.log(blogs);
 ---
 
 <Layout title="Blog">
   <Container>
     <Sectionhead>
-      <Fragment slot="title">Our Blog</Fragment>
+      <Fragment slot="title">Blogs</Fragment>
       <Fragment slot="desc">
-        We write about building startups and thoughts going on our mind.
+        I am a medical doctor and a creative writer of fiction, non fiction & self help books.
       </Fragment>
     </Sectionhead>
     <main class="mt-16">
       <ul class="grid gap-16 max-w-4xl mx-auto">
         {
-          publishedBlogEntries.map((blogPostEntry, index) => (
+          blogs.map((blogPostEntry, index) => (
             <li>
               <a href={`/blog/${blogPostEntry.slug}`}>
                 <div class="grid md:grid-cols-2 gap-5 md:gap-10 items-center">
                   <Picture
-                    src={blogPostEntry.data.image.src}
-                    alt={blogPostEntry.data.image.alt}
+                    src={blogPostEntry.imageUrl}
+                    alt={blogPostEntry.imageUrl}
                     sizes="(max-width: 800px) 100vw, 800px"
                     width={800}
                     height={600}
@@ -60,22 +62,17 @@ const blogs : Blog[]  = await getBlogs();
                   />
                   <div>
                     <span class="text-blue-400 uppercase tracking-wider text-sm font-medium">
-                      {blogPostEntry.data.category}
-                    </span>
-
-                    <h2 class="text-3xl font-semibold leading-snug tracking-tight mt-1 ">
-                      {blogPostEntry.data.title}
-                    </h2>
-
-                    <div class="flex gap-2 mt-3">
-                      <span class="text-gray-400">
-                        {blogPostEntry.data.author}
+                      Sapna Deb             
                       </span>
-                      <span class="text-gray-400">• </span>
+                    <h2 class="text-3xl font-semibold leading-snug tracking-tight mt-1 ">
+                      {blogPostEntry.blogname}
+                    </h2>
+                    <div class="flex gap-0 mt-3">
+                      <span class="text-gray-400"></span>
                       <time
                         class="text-gray-400"
-                        datetime={blogPostEntry.data.publishDate.toISOString()}>
-                        {blogPostEntry.data.publishDate.toDateString()}
+                        datetime={blogPostEntry.PublicationDate}>
+                        {blogPostEntry.PublicationDate.substring(0,10)}
                       </time>
                     </div>
                   </div>
@@ -88,3 +85,9 @@ const blogs : Blog[]  = await getBlogs();
     </main>
   </Container>
 </Layout>
+
+
+
+
+
+

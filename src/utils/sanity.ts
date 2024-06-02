@@ -1,5 +1,7 @@
 
-
+import React from 'react'
+import * as ReactDOM from 'react-dom'
+import {PortableText} from '@portabletext/react'
 // sanity.js
 import {createClient} from '@sanity/client'
 // Import using ESM URL imports in environments that supports it:
@@ -13,14 +15,22 @@ export const client = createClient({
   // token: process.env.SANITY_SECRET_TOKEN // Only if you want to update content with the client
 })
 
+const data = await client.fetch(`count(*)`)
+console.log(`Number of documents: ${data}`)
+
+
+
+
 // uses GROQ to query content: https://www.sanity.io/docs/groq
 export async function getBlogs() {
-  const posts = await client.fetch('*[_type == "blog"]')
+  const posts = await client.fetch('*[_type == "blog"] {"blogname": name,"slug": slug.current,"PublicationDate": PublicationDate,"imageUrl": image.asset->url,"ContentBody": ContentBody[].children[].text,"Summary": Summary[].children[].text,"FurtherReading": FurtherReading[].children[].text}')
+  console.log(`Name: ${posts}`)
   return posts
 }
 
-export async function getBlog(id: string) {
-  const post = await client.fetch(`*[_type == "blog" && _id == $id]`, {id})
+
+export async function getBlog(slug: string) {
+  const post = await client.fetch(`*[_type == "blog" && slug == $slug]`, {slug})
   return post
 }
 
@@ -60,3 +70,6 @@ export type Blog = {
   };
   PublicationDate: string;
 };
+
+
+
