@@ -1,6 +1,6 @@
 ---
 import { Picture } from "astro:assets";
-import Book from "assets/Book.png";
+import Book from "assets/BookCover.png";
 import Link from "@components/ui/link.astro";
 import { Icon } from "astro-icon";
 ---
@@ -11,8 +11,8 @@ import { Icon } from "astro-icon";
     <Picture
       src={Book}
       alt="Astronaut in the air"
-      widths={[200, 400, 600]}
-      sizes="(max-width: 800px) 100vw, 620px"
+      widths={[200, 400, 1800]}
+      sizes="(max-width: 600px) 100vw, 620px"
       loading="eager"
       format="avif"
     />
