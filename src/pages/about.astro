@@ -19,21 +19,21 @@ import Sectionhead from "@components/sectionhead.astro";
     </Sectionhead>
 
 
-    <div class="flex grid md:grid-cols-3 gap-10 mx-auto max-w-4xl mt-12">
-      {
-          <div class="group">
-            <div class="w-full aspect-square">
-              <Picture
-                src={`https://m.media-amazon.com/images/S/amzn-author-media-prod/dnn1t4jhr5belad2dfcg0o9ir3._SY450_CR0%2C0%2C450%2C450_.jpg`}
-                alt={`https://m.media-amazon.com/images/S/amzn-author-media-prod/dnn1t4jhr5belad2dfcg0o9ir3._SY450_CR0%2C0%2C450%2C450_.jpg`}
-                sizes="(max-width: 800px) 100vw, 400px"
-                width={400}
-                height={400}
-                class="w-full rounded-md rounded transition group-hover:-translate-y-1 group-hover:shadow-xl bg-white object-cover object-center aspect-square"
-              />
-            </div>
-          </div>
-      }
+    <div class="flex grid md:grid-cols-1 gap-10 mx-auto max-w-l mt-12 justify-center">
+      <div class="group">
+        <div class="flex w-full flex justify-center items-center">
+          <Picture
+            src={`https://m.media-amazon.com/images/S/amzn-author-media-prod/dnn1t4jhr5belad2dfcg0o9ir3._SY450_CR0%2C0%2C450%2C450_.jpg`}
+            alt={`https://m.media-amazon.com/images/S/amzn-author-media-prod/dnn1t4jhr5belad2dfcg0o9ir3._SY450_CR0%2C0%2C450%2C450_.jpg`}
+            sizes="(max-width: 800px) 100vw, 400px"
+            width={200}
+            height={200}
+            class="w-48 h-48 rounded-md transition group-hover:-translate-y-1 group-hover:shadow-xl bg-white object-cover object-center"
+          />
+        </div>
+      </div>
     </div>
+    
+    
   </Container>
 </Layout>

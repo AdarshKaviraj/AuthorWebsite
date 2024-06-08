@@ -1,0 +1,24 @@
+---
+import type { UrlComponents } from 'sanity';
+
+export interface Props {
+  book: {
+    title: string;
+    description: string;
+    photo: string;
+    summary: string;
+    url: string;
+  };
+}
+const { book } = Astro.props;
+---
+
+<div class="bg-white shadow-md rounded-lg overflow-hidden">
+  <img src={book.photo} alt={book.title} class="w-full h-80 object-cover" />
+  <div class="p-6">
+    <h2 class="text-xl font-bold mb-2">{book.title}</h2>
+    <h1 class="text-l mb-2">{book.description}</h1>
+    <p class="text-gray-700">{book.summary}</p>
+  </div>
+</div>
+
