@@ -40,8 +40,5 @@ export const blogType = defineType({
       type: 'array',
       of: [{type: 'block'}]
     }),
-    
-    
-
   ],
 })
