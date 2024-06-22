@@ -7,17 +7,20 @@ import { client, getBlog } from "@utils/sanity.ts";
 import { useSanityClient } from 'astro-sanity';
 
 export async function load( SLUG ) {
+
   // Fetch the blog post data
   const postResponse = await client.fetch(`*[_type == "blog"][0]`, { slug: SLUG });
+  
 
   // Fetch comments associated with the post
-  const commentsData = await client.fetch(`*[_type == "comment"]`, {post: postResponse?._id}); 
+  const commentsData = await client.fetch(`*[_type == "comment"]`, {post: postResponse?._id});
+  
 
   console.log(commentsData, "COMMENT");
 
   return {
     props: {
-      commentsData, // Processed comments with plain text
+      commentsData // Processed comments with plain text
     },
     
   };
@@ -26,12 +29,13 @@ export async function load( SLUG ) {
 export async function getStaticPaths() {
   const posts = await useSanityClient().fetch(`*[_type == "blog"]`);
   
-  console.log("HELLO")
+  console.log("Fetched blog specific slug")
   return posts.map((post) => {
     const getText = (blocks) => {
       return blocks.map(block => block.children.map(child => child.text).join('')).join('');
     };
     load(post.slug?.current)
+    console.log("Current Slug:",post.slug?.current)
 
     return {
       params: {
@@ -53,10 +57,6 @@ export async function getStaticPaths() {
 // Usage in a component
 //const { name, PublicationDate, ContentBody, Summary, FurtherReading } = Astro.props;
 let { name, PublicationDate, ContentBody, Summary, FurtherReading, comments=[], slug } = Astro.props;
-//console.log(comments);
-console.log(slug);
- 
-
 
 const truncateddate = PublicationDate.substring(0,10)
 

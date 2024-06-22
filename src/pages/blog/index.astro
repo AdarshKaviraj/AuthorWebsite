@@ -8,18 +8,6 @@ import Sectionhead from "@components/sectionhead.astro";
 import { getBlogs } from "@utils/sanity.ts";
 
 
-// type Blog = {
-//   name: string;
-//   slug: {
-//     current: string;
-//   };
-//   image: {
-//     asset: {
-//       _ref: string;
-//     };
-//   };
-//   PublicationDate: string;
-// };
 type Blog = {
   blogname: string;
   slug: string;
@@ -32,7 +20,6 @@ type Blog = {
 
 
 const blogs : Blog[]  = await getBlogs();
-console.log(blogs);
 ---
 
 <Layout title="Blog">
