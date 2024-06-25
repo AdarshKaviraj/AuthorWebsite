@@ -4,7 +4,44 @@ import Book from "assets/BookCover.png";
 import Link from "@components/ui/link.astro";
 import { Icon } from "astro-icon";
 ---
+<main class="grid lg:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24">
+  <div class="py-6 order-1 block md:block">
+    <Picture
+      src={Book}
+      alt="Astronaut in the air"
+      widths={[200, 400, 1800]}
+      sizes="(max-width: 600px) 100vw, 620px"
+      loading="eager"
+      format="avif"
+    />
+  </div>
+  <div class="text-center md:text-left">
+    <p class="text-lg mt-4 text-blue-400 uppercase max-w-xl tracking-wider text-sm font-bold">
+      Latest Release by Dr. Sapna Deb
+    </p>
+    <br>
+    <h1 class="text-5xl lg:text-6xl xl:text-7xl font-bold lg:tracking-tight xl:tracking-tighter">
+      How To Boost Self Esteem
+    </h1>
+    <p class="text-lg mt-4 text-slate-600 max-w-xl mx-auto md:mx-0">
+      Conquer Self Doubt, Become Assertive, Inculcate Self Love and Shine With Unprecedented Confidence
+    </p>
+    <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+      <Link
+        href="https://www.amazon.com/How-Boost-Self-Esteem-Unprecedented-ebook/dp/B0CSBNY3CR/?content-id=amzn1.sym.cf86ec3a-68a6-43e9-8115-04171136930a"
+        target="_blank"
+        class="flex gap-1 items-center justify-center bg-blue-500 text-white py-2 px-4 rounded"
+        rel="noopener">
+        <script src="https://kit.fontawesome.com/d06e24dbb4.js" crossorigin="anonymous"></script>
+        <i class="fa-brands fa-amazon w-5 h-5"></i>
+        Buy Online
+      </Link>
+    </div>
+  </div>
+</main>
 
+
+<!-- 
 <main
   class="grid lg:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24">
   <div class="py-6 md:order-1 hidden md:block">
@@ -38,11 +75,10 @@ import { Icon } from "astro-icon";
         target="_blank"
         class="flex gap-1 items-center justify-center"
         rel="noopener">
-        <!-- <Icon class="text-white w-5 h-5" name="bx:bxs-cloud-download" /> -->
         <script src="https://kit.fontawesome.com/d06e24dbb4.js" crossorigin="anonymous"></script>
         <i class="flexbox text-white w-5 h-5 fa-brands fa-amazon"></i>
          Buy Online
       </Link>
     </div>
   </div>
-</main>
+</main> -->
