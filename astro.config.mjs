@@ -9,6 +9,7 @@ import { loadEnv } from "vite";
 // } = loadEnv(import.meta.env.MODE, process.cwd(), "");
 
 import { defineConfig } from "astro/config";
+import node from '@astrojs/node';
 
 // Different environments use different variables
 // const projectId = PUBLIC_SANITY_STUDIO_PROJECT_ID || PUBLIC_SANITY_PROJECT_ID;
@@ -28,6 +29,10 @@ import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
+  output: 'server',
+  adapter: node({
+    mode: 'standalone' // or 'middleware' depending on your use case
+  }),
   site: "https://example.com",
   // Hybrid+adapter is required to support embedded Sanity Studio
   integrations: [

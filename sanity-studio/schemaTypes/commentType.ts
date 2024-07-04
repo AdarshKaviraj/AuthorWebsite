@@ -20,8 +20,9 @@ export const commentType = defineType({
     }),
     defineField({
       name: 'comment',
-      type: 'array',
-      of: [{type: 'block'}]
+      type: 'string',
+      title: 'Comment',
+      validation: (rule) => rule.required().error('Text is required'),
     }),
     defineField({
       name: 'approved',

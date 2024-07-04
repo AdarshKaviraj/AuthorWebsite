@@ -12,6 +12,7 @@ export const client = createClient({
     dataset: 'production',
   useCdn: true, // set to `false` to bypass the edge cache
   apiVersion: '2024-06-01', // use current date (YYYY-MM-DD) to target the latest API version
+  token: 'skCqNj2czpWhomhPXidPWUodhjLhHzjppmva0WYtA3XjnsTjlBUQzPgI0Qxf3Dj14J9aLwSsKmL3TBoO4Tu8o2ugnBjaXS0YPs1z9yPlYdykDLsqNJNpbqzB00hktScclJHXErsDunnmqsLhuoXCuPy5yclUtWb93hLJLjSkh2LGN4xuRvTQ'
   // token: process.env.SANITY_SECRET_TOKEN // Only if you want to update content with the client
 })
 
