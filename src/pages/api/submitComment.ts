@@ -17,10 +17,11 @@ export async function POST({ request, url }) {
   const name = formData.get('name');
   const email = formData.get('email');
   const comment = formData.get('comment');
-  const postId = url.searchParams.get('postId'); // Get the post ID from the URL parameters
+  const postId = url.searchParams.get('postId');
+  const parentCommentId = formData.get('parentCommentId');
 
   try {
-    await client.create({
+    const commentData = {
       _type: 'comment',
       name,
       email,
@@ -29,7 +30,16 @@ export async function POST({ request, url }) {
         _type: 'reference',
         _ref: postId,
       },
-    });
+    };
+
+    if (parentCommentId) {
+      commentData.parentComment = {
+        _type: 'reference',
+        _ref: parentCommentId,
+      };
+    }
+
+    await client.create(commentData);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

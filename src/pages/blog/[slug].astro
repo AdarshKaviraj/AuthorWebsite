@@ -6,7 +6,6 @@ import { client, getBlog } from "@utils/sanity.ts";
 
 import { useSanityClient } from 'astro-sanity';
 
-
 export async function getStaticPaths() {
   console.log("Starting getStaticPaths");
   const posts = await client.fetch(`*[_type == "blog"]{
@@ -22,7 +21,14 @@ export async function getStaticPaths() {
       name,
       email,
       comment,
-      _createdAt
+      _createdAt,
+      "replies": *[_type == "comment" && parentComment._ref == ^._id && approved == true]{
+        _id,
+        name,
+        email,
+        comment,
+        _createdAt
+      }
     }
   }`);
   
@@ -49,13 +55,9 @@ export async function getStaticPaths() {
   return paths;
 }
 
-getStaticPaths()
-
 export const prerender = true;
-console.log("Props in component:", Astro.props);
 const { name, _id, PublicationDate, ContentBody, Summary, FurtherReading, slug, comments } = Astro.props;
-console.log("Destructured props:", { name, _id, PublicationDate, ContentBody, Summary, FurtherReading, slug });
-// Format the date
+
 const formattedDate = new Date(PublicationDate).toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
@@ -68,14 +70,13 @@ function renderPortableText(blocks) {
     if (block._type === 'block' && block.children) {
       return block.children.map(child => child.text).join('');
     }
-    // Handle other block types as needed
     return '';
   }).join('\n\n');
 }
+
 function isValidContent(content) {
   return Array.isArray(content) && content.length > 0;
 }
-
 ---
 
 <Layout title={name || 'Blog Post'}>
@@ -92,7 +93,6 @@ function isValidContent(content) {
         <time class="text-gray-400" datetime={formattedDate}>
           {formattedDate}
         </time>
-        <span class="text-gray-400 hidden md:block"></span>
       </div>
     </div>
 
@@ -135,7 +135,7 @@ function isValidContent(content) {
     <!-- Comment submission form -->
     <div class="comment-form-container mx-auto max-w-3xl mt-8 p-6 bg-white rounded-md shadow-md">
       <h2 class="text-2xl font-semibold mb-4">Submit a Comment</h2>
-      <form method="POST" action={`/api/submitComment?postId=${_id}`} enctype="application/x-www-form-urlencoded">
+      <form method="POST" action={`/api/submitComment?postId=${_id}`} class="main-comment-form">
         <input 
           type="text" 
           name="name" 
@@ -156,18 +156,16 @@ function isValidContent(content) {
           required 
           class="w-full p-3 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
           rows="5"></textarea>
-          <script>
-            document.getElementById('submitCommentButton').onclick = function() {
-                alert("Comment submitted, will be reviewed and approved");
-            };
-        </script>
         <button 
           type="submit" 
-           id="submitCommentButton"
+          id="submitCommentButton"
           class="w-full p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
           Submit Comment
         </button>
-            <!-- Comments section -->
+      </form>
+    </div>
+
+    <!-- Comments section -->
     <div class="comments-section mx-auto max-w-3xl mt-8">
       <h2 class="text-2xl font-semibold mb-4">Comments</h2>
       {comments && comments.length > 0 ? (
@@ -179,25 +177,99 @@ function isValidContent(content) {
               day: 'numeric'
             })}</span></p>
             <p>{comment.comment}</p>
+            <button class="reply-button text-blue-600 mt-2" data-comment-id={comment._id}>Reply</button>
+            
+            <!-- Reply form (hidden by default) -->
+            <form class="reply-form hidden mt-4" data-parent-id={comment._id}>
+              <input type="text" name="name" placeholder="Your name" required class="w-full p-2 mb-2 border border-gray-300 rounded-md" />
+              <input type="email" name="email" placeholder="Your email" required class="w-full p-2 mb-2 border border-gray-300 rounded-md" />
+              <textarea name="comment" placeholder="Your reply" required class="w-full p-2 mb-2 border border-gray-300 rounded-md"></textarea>
+              <button type="submit" class="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Submit Reply</button>
+            </form>
+
+            <!-- Replies -->
+            {comment.replies && comment.replies.length > 0 && (
+              <div class="replies ml-8 mt-4">
+                {comment.replies.map(reply => (
+                  <div key={reply._id} class="reply mb-2 p-3 bg-gray-50 rounded-md">
+                    <p><strong>{reply.name}</strong> <span class="text-gray-400">on {new Date(reply._createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}</span></p>
+                    <p>{reply.comment}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ))
       ) : (
         <p>No comments yet.</p>
       )}
     </div>
-
-      </form>
-    </div>
   </Container>
+
+  <script>
+    // Handle reply button clicks
+    document.querySelectorAll('.reply-button').forEach(button => {
+      button.addEventListener('click', () => {
+        const commentId = button.dataset.commentId;
+        const replyForm = document.querySelector(`.reply-form[data-parent-id="${commentId}"]`);
+        replyForm.classList.toggle('hidden');
+      });
+    });
+
+    // Handle reply form submissions
+    document.querySelectorAll('.reply-form').forEach(form => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const postId = new URL(document.querySelector('.main-comment-form').action).searchParams.get('postId');
+        formData.append('parentCommentId', form.dataset.parentId);
+        
+        try {
+          const response = await fetch(`/api/submitComment?postId=${postId}`, {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (response.ok) {
+            alert('Reply submitted successfully. It will be reviewed and approved.');
+            form.reset();
+            form.classList.add('hidden');
+          } else {
+            alert('Failed to submit reply. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error submitting reply:', error);
+          alert('An error occurred while submitting your reply. Please try again.');
+        }
+      });
+    });
+
+    // Handle main comment form submission
+    document.querySelector('.main-comment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (response.ok) {
+          alert('Comment submitted successfully. It will be reviewed and approved.');
+          form.reset();
+        } else {
+          alert('Failed to submit comment. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error submitting comment:', error);
+        alert('An error occurred while submitting your comment. Please try again.');
+      }
+    });
+  </script>
 </Layout>
-
-
-
-<!-- 
-
-<form method="POST" action={`/api/submitcomment`}>
-  <input type="text" name="name" placeholder="Your name" required />
-  <input type="email" name="email" placeholder="Your email" required />
-  <textarea name="comment" placeholder="Your comment" required></textarea>
-  <button type="submit">Submit Comment</button>
-</form> -->
