@@ -92,8 +92,6 @@ The `.` will clone it to the current directory so make sure you are inside your 
 npm install
 # or
 yarn install
-# or (recommended)
-pnpm install
 ```
 
 ### 3. Start development Server
@@ -102,8 +100,6 @@ pnpm install
 npm run dev
 # or
 yarn dev
-# or (recommended)
-pnpm dev
 ```
 
 ### Preview & Build
@@ -114,20 +110,11 @@ npm run build
 # or
 yarn preview
 yarn build
-# or (recommended)
-pnpm preview
-pnpm build
 ```
 
-We recommend using [pnpm](https://pnpm.io/) to save disk space on your computer.
 
 ### Other Commands
 
-```bash
-pnpm astro ...
-pnpm astro add
-pnpm astro --help
-```
 
 ## Project Structure
 
