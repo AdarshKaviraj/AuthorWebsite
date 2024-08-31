@@ -4,6 +4,8 @@ import Layout from "@layouts/Layout.astro";
 import container from "@components/container.astro";
 import { client, getBlog } from "@utils/sanity.ts";
 
+import { useSanityClient } from 'astro-sanity';
+
 export async function getStaticPaths() {
   console.log("Starting getStaticPaths");
   const posts = await client.fetch(`*[_type == "blog"]{
