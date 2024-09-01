@@ -1,7 +1,10 @@
 import { client } from "@utils/sanity.ts";
 
-export async function POST({ request, url }) {
-  const contentType = request.headers.get('content-type');
+// If you want to use Express types:
+import type { IncomingMessage } from 'http'; // Use Node's built-in types
+
+export async function POST({ request, url }: { request: IncomingMessage & { formData: () => Promise<FormData> }, url: URL }) {
+  const contentType = request.headers['content-type'];
   console.log('Content-Type:', contentType);
 
   if (!contentType || !['application/x-www-form-urlencoded', 'multipart/form-data'].some(type => contentType.includes(type))) {
@@ -14,11 +17,11 @@ export async function POST({ request, url }) {
   }
 
   const formData = await request.formData();
-  const name = formData.get('name');
-  const email = formData.get('email');
-  const comment = formData.get('comment');
+  const name = formData.get('name')?.toString();
+  const email = formData.get('email')?.toString();
+  const comment = formData.get('comment')?.toString();
   const postId = url.searchParams.get('postId');
-  const parentCommentId = formData.get('parentCommentId');
+  const parentCommentId = formData.get('parentCommentId')?.toString();
 
   try {
     const commentData = {
@@ -30,14 +33,13 @@ export async function POST({ request, url }) {
         _type: 'reference',
         _ref: postId,
       },
+      ...(parentCommentId && {
+        parentComment: {
+          _type: 'reference',
+          _ref: parentCommentId,
+        }
+      })
     };
-
-    if (parentCommentId) {
-      commentData.parentComment = {
-        _type: 'reference',
-        _ref: parentCommentId,
-      };
-    }
 
     await client.create(commentData);
 
@@ -49,7 +51,9 @@ export async function POST({ request, url }) {
     });
   } catch (error) {
     console.error('Failed to submit comment', error);
-    return new Response(JSON.stringify({ success: false, error: error.message, stack: error.stack }), {
+    const err = error as Error; // Type assertion
+
+    return new Response(JSON.stringify({ success: false, error: err.message, stack: err.stack }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',

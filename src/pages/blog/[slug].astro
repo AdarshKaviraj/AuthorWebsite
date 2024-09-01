@@ -72,7 +72,7 @@ export async function getStaticPaths() {
 }
 
 export const prerender = true;
-const { name, _id, PublicationDate, ContentBody, Summary, FurtherReading, slug, comments } = Astro.props;
+const { name, _id, PublicationDate, ContentBody, Summary, FurtherReading, comments } = Astro.props;
 
 const formattedDate = new Date(PublicationDate).toLocaleDateString('en-US', {
   year: 'numeric',
@@ -115,7 +115,7 @@ function isValidContent(content: any[] | undefined): content is any[] {
     {isValidContent(ContentBody) ? (
       <div class="mx-auto prose prose-lg mt-6 max-w-3xl">
         {ContentBody.map((block: any, index: number) => (
-          <p key={index} set:html={renderPortableText([block])} />
+          <p set:html={renderPortableText([block])} />
         ))}
       </div>
     ) : (
@@ -126,7 +126,7 @@ function isValidContent(content: any[] | undefined): content is any[] {
       <div class="mx-auto prose prose-lg mt-6 max-w-3xl">
         <h2>Summary</h2>
         {Summary.map((block: any, index: number) => (
-          <p key={index} set:html={renderPortableText([block])} />
+          <p set:html={renderPortableText([block])} />
         ))}
       </div>
     )}
@@ -135,7 +135,7 @@ function isValidContent(content: any[] | undefined): content is any[] {
       <div class="text-gray-400 mx-auto prose prose-lg mt-6 max-w-3xl">
         <h2>Further Reading</h2>
         {FurtherReading.map((block: any, index: number) => (
-          <p key={index} set:html={renderPortableText([block])} />
+          <p set:html={renderPortableText([block])} />
         ))}
       </div>
     )}
@@ -186,7 +186,7 @@ function isValidContent(content: any[] | undefined): content is any[] {
       <h2 class="text-2xl font-semibold mb-4">Comments</h2>
       {comments && comments.length > 0 ? (
         comments.map((comment: Comment) => (
-          <div key={comment._id} class="comment mb-4 p-4 bg-gray-100 rounded-md">
+          <div class="comment mb-4 p-4 bg-gray-100 rounded-md">
             <p><strong>{comment.name}</strong> <span class="text-gray-400">on {new Date(comment._createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
@@ -207,7 +207,7 @@ function isValidContent(content: any[] | undefined): content is any[] {
             {comment.replies && comment.replies.length > 0 && (
               <div class="replies ml-8 mt-4">
                 {comment.replies.map((reply: Comment) => (
-                  <div key={reply._id} class="reply mb-2 p-3 bg-gray-50 rounded-md">
+                  <div class="reply mb-2 p-3 bg-gray-50 rounded-md">
                     <p><strong>{reply.name}</strong> <span class="text-gray-400">on {new Date(reply._createdAt).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
