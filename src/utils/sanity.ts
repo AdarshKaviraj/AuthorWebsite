@@ -1,7 +1,7 @@
 
-import React from 'react'
-import * as ReactDOM from 'react-dom'
-import {PortableText} from '@portabletext/react'
+//import React from 'react'
+//import * as ReactDOM from 'react-dom'
+//import {PortableText} from '@portabletext/react'
 // sanity.js
 import {createClient} from '@sanity/client'
 // Import using ESM URL imports in environments that supports it:
