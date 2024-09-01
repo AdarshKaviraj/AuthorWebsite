@@ -6,6 +6,8 @@
 import {createClient} from '@sanity/client'
 // Import using ESM URL imports in environments that supports it:
 // import {createClient} from 'https://esm.sh/@sanity/client'
+import { useSanityClient } from 'astro-sanity';
+
 
 export const client = createClient({
     projectId: 'nm989itl',
@@ -45,5 +47,5 @@ export type Blog = {
   PublicationDate: string;
 };
 
-
+export { useSanityClient };
 
