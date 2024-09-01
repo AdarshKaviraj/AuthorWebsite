@@ -1,6 +1,8 @@
 {
-  "extends": "astro/tsconfigs/base",
+  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "baseUrl": "src",
     "strictNullChecks": true,
     "types": ["astro/client"],
@@ -11,6 +13,21 @@
       "@layouts/*": ["layouts/*"],
       "@assets/*": ["assets/*"],
       "@pages/*": ["pages/*"]
-    }
-  }
+    },
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "skipLibCheck": true,
+    "strict": true,
+    "importsNotUsedAsValues": "remove",
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve"
+  },
+  "includes": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "dist", ".vercel"]
 }
+

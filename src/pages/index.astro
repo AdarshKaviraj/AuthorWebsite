@@ -1,14 +1,23 @@
 ---
-import Container from "@components/container.astro";
-import Cta from "@components/cta.astro";
-import Features from "@components/features.astro";
+import Card from "../components/Card.astro";
+import Welcome from "../components/Welcome.astro";
+
+import { getPosts } from "../utils/sanity";
 import Hero from "@components/hero.astro";
 import Logos from "@components/logos.astro";
 import Layout from "@layouts/Layout.astro";
+import Container from "@components/container.astro";
+import Cta from "@components/cta.astro";
 
-
-
+const posts = await getPosts();
 ---
+<!-- 
+<Layout title="Welcome to Astro.">
+  <section>
+    {posts.length ? posts.map((post) => <Card post={post} />) : <Welcome />}
+  </section>
+</Layout> -->
+
 
 <Layout title="">
   <Container>
@@ -17,3 +26,4 @@ import Layout from "@layouts/Layout.astro";
     <Cta />
   </Container>
 </Layout>
+
