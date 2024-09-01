@@ -1,12 +1,30 @@
 ---
-//import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
-//import container from "@components/container.astro";
-import { client} from "@utils/sanity.ts";
+import { client } from "@utils/sanity.ts";
+
+interface Comment {
+  _id: string;
+  name: string;
+  email: string;
+  comment: string;
+  _createdAt: string;
+  replies?: Comment[];
+}
+
+interface BlogPost {
+  _id: string;
+  slug: { current: string };
+  name: string;
+  PublicationDate: string;
+  ContentBody: any[];
+  Summary?: any[];
+  FurtherReading?: any[];
+  comments?: Comment[];
+}
 
 export async function getStaticPaths() {
   console.log("Starting getStaticPaths");
-  const posts = await client.fetch(`*[_type == "blog"]{
+  const posts = await client.fetch<BlogPost[]>(`*[_type == "blog"]{
     _id,
     slug,
     name,
@@ -32,7 +50,7 @@ export async function getStaticPaths() {
   
   console.log("Fetched posts:", posts);
 
-  const paths = posts.map((post) => {
+  const paths = posts.map((post: BlogPost) => {
     console.log("Processing post:", post._id);
     return {
       params: { slug: post.slug.current },
@@ -62,23 +80,23 @@ const formattedDate = new Date(PublicationDate).toLocaleDateString('en-US', {
   day: 'numeric'
 });
 
-function renderPortableText(blocks) {
+function renderPortableText(blocks: any[]): string {
   if (!blocks || !Array.isArray(blocks)) return '';
   return blocks.map(block => {
     if (block._type === 'block' && block.children) {
-      return block.children.map(child => child.text).join('');
+      return block.children.map((child: { text: string }) => child.text).join('');
     }
     return '';
   }).join('\n\n');
 }
 
-function isValidContent(content) {
+function isValidContent(content: any[] | undefined): content is any[] {
   return Array.isArray(content) && content.length > 0;
 }
 ---
 
 <Layout title={name || 'Blog Post'}>
-  <container>
+  <div class="container mx-auto">
     <div class="mx-auto max-w-3xl mt-14">
       <h1 class="text-4xl lg:text-5xl font-bold lg:tracking-tight mt-1 lg:leading-tight">
         {name || 'Loading...'}
@@ -96,7 +114,7 @@ function isValidContent(content) {
 
     {isValidContent(ContentBody) ? (
       <div class="mx-auto prose prose-lg mt-6 max-w-3xl">
-        {ContentBody.map((block, index) => (
+        {ContentBody.map((block: any, index: number) => (
           <p key={index} set:html={renderPortableText([block])} />
         ))}
       </div>
@@ -107,7 +125,7 @@ function isValidContent(content) {
     {isValidContent(Summary) && (
       <div class="mx-auto prose prose-lg mt-6 max-w-3xl">
         <h2>Summary</h2>
-        {Summary.map((block, index) => (
+        {Summary.map((block: any, index: number) => (
           <p key={index} set:html={renderPortableText([block])} />
         ))}
       </div>
@@ -116,7 +134,7 @@ function isValidContent(content) {
     {isValidContent(FurtherReading) && (
       <div class="text-gray-400 mx-auto prose prose-lg mt-6 max-w-3xl">
         <h2>Further Reading</h2>
-        {FurtherReading.map((block, index) => (
+        {FurtherReading.map((block: any, index: number) => (
           <p key={index} set:html={renderPortableText([block])} />
         ))}
       </div>
@@ -167,7 +185,7 @@ function isValidContent(content) {
     <div class="comments-section mx-auto max-w-3xl mt-8">
       <h2 class="text-2xl font-semibold mb-4">Comments</h2>
       {comments && comments.length > 0 ? (
-        comments.map(comment => (
+        comments.map((comment: Comment) => (
           <div key={comment._id} class="comment mb-4 p-4 bg-gray-100 rounded-md">
             <p><strong>{comment.name}</strong> <span class="text-gray-400">on {new Date(comment._createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
@@ -188,7 +206,7 @@ function isValidContent(content) {
             <!-- Replies -->
             {comment.replies && comment.replies.length > 0 && (
               <div class="replies ml-8 mt-4">
-                {comment.replies.map(reply => (
+                {comment.replies.map((reply: Comment) => (
                   <div key={reply._id} class="reply mb-2 p-3 bg-gray-50 rounded-md">
                     <p><strong>{reply.name}</strong> <span class="text-gray-400">on {new Date(reply._createdAt).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -206,15 +224,17 @@ function isValidContent(content) {
         <p>No comments yet.</p>
       )}
     </div>
-  </Container>
+  </div>
 
   <script>
     // Handle reply button clicks
     document.querySelectorAll('.reply-button').forEach(button => {
       button.addEventListener('click', () => {
-        const commentId = button.dataset.commentId;
+        const commentId = (button as HTMLElement).dataset.commentId;
         const replyForm = document.querySelector(`.reply-form[data-parent-id="${commentId}"]`);
-        replyForm.classList.toggle('hidden');
+        if (replyForm) {
+          replyForm.classList.toggle('hidden');
+        }
       });
     });
 
@@ -222,9 +242,10 @@ function isValidContent(content) {
     document.querySelectorAll('.reply-form').forEach(form => {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const formData = new FormData(form);
-        const postId = new URL(document.querySelector('.main-comment-form').action).searchParams.get('postId');
-        formData.append('parentCommentId', form.dataset.parentId);
+        const formData = new FormData(form as HTMLFormElement);
+        const mainForm = document.querySelector('.main-comment-form') as HTMLFormElement;
+        const postId = new URL(mainForm.action).searchParams.get('postId');
+        formData.append('parentCommentId', (form as HTMLElement).dataset.parentId || '');
         
         try {
           const response = await fetch(`/api/submitComment?postId=${postId}`, {
@@ -234,7 +255,7 @@ function isValidContent(content) {
           
           if (response.ok) {
             alert('Reply submitted successfully. It will be reviewed and approved.');
-            form.reset();
+            (form as HTMLFormElement).reset();
             form.classList.add('hidden');
           } else {
             alert('Failed to submit reply. Please try again.');
@@ -247,27 +268,30 @@ function isValidContent(content) {
     });
 
     // Handle main comment form submission
-    document.querySelector('.main-comment-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
-      
-      try {
-        const response = await fetch(form.action, {
-          method: 'POST',
-          body: formData
-        });
+    const mainCommentForm = document.querySelector('.main-comment-form');
+    if (mainCommentForm) {
+      mainCommentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
         
-        if (response.ok) {
-          alert('Comment submitted successfully. It will be reviewed and approved.');
-          form.reset();
-        } else {
-          alert('Failed to submit comment. Please try again.');
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (response.ok) {
+            alert('Comment submitted successfully. It will be reviewed and approved.');
+            form.reset();
+          } else {
+            alert('Failed to submit comment. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error submitting comment:', error);
+          alert('An error occurred while submitting your comment. Please try again.');
         }
-      } catch (error) {
-        console.error('Error submitting comment:', error);
-        alert('An error occurred while submitting your comment. Please try again.');
-      }
-    });
+      });
+    }
   </script>
 </Layout>

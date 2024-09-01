@@ -1,7 +1,7 @@
 import { client } from "@utils/sanity.ts";
 
 // Fetch comments
-export async function get({ params }) {
+export async function get({ params }: any) {
   const { slug } = params;
   const query = `*[_type == "comment" && post._ref == $slug && approved == true]`;
   const comments = await client.fetch(query, { slug });
@@ -9,7 +9,7 @@ export async function get({ params }) {
 }
 
 // Post a new comment
-export async function post(request) {
+export async function post(request:any) {
   const { name, email, comment, postSlug, parentCommentId } = await request.json();
   const doc = {
     _type: 'comment',
