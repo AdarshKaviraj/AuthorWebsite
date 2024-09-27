@@ -1,11 +1,9 @@
 import { client } from "@utils/sanity.ts";
 
-// If you want to use Express types:
-import type { IncomingMessage } from 'http'; // Use Node's built-in types
+export const prerender = false;
 
-export async function POST({ request, url }: { request: IncomingMessage & { formData: () => Promise<FormData> }, url: URL }) {
-  const contentType = request.headers['content-type'];
-  console.log('Content-Type:', contentType);
+export async function POST({ request, url }: { request: Request; url: URL }) {
+  const contentType = request.headers.get('content-type');
 
   if (!contentType || !['application/x-www-form-urlencoded', 'multipart/form-data'].some(type => contentType.includes(type))) {
     return new Response(JSON.stringify({ success: false, error: 'Invalid Content-Type' }), {
@@ -15,7 +13,7 @@ export async function POST({ request, url }: { request: IncomingMessage & { form
       },
     });
   }
-
+  
   const formData = await request.formData();
   const name = formData.get('name')?.toString();
   const email = formData.get('email')?.toString();
@@ -51,7 +49,7 @@ export async function POST({ request, url }: { request: IncomingMessage & { form
     });
   } catch (error) {
     console.error('Failed to submit comment', error);
-    const err = error as Error; // Type assertion
+    const err = error as Error;
 
     return new Response(JSON.stringify({ success: false, error: err.message, stack: err.stack }), {
       status: 500,
